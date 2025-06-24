@@ -65,11 +65,12 @@ def scan_network(ip_list, timeout, max_threads):
         futures = {executor.submit(reverse_lookup, ip, timeout): ip for ip in ip_list}
         for future in as_completed(futures):
             domain = future.result()
+            ip = futures[future]  # نحصل على الـ IP المقابل للدومين
             if domain:
                 port80 = is_port_open(domain, port=80, timeout=timeout)
                 status_msg = f"{Fore.GREEN}[port 80 open]" if port80 else f"{Fore.RED}[port 80 closed]"
-                print(f"{Fore.CYAN}[+] Found domain: {Fore.YELLOW}{domain} {status_msg}")
-                found_domains.append(f"{domain} {'[port 80 open]' if port80 else '[port 80 closed]'}")
+                print(f"{Fore.CYAN}[+] Found domain: {Fore.YELLOW}{domain} {status_msg} {Fore.MAGENTA}(IP: {ip})")
+                found_domains.append(f"{domain} {status_msg} (IP: {ip})")
     return found_domains
 
 def main():
